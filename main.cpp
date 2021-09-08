@@ -1,13 +1,12 @@
-#include <array>
 #include <execution>
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <thread>
-#include "Timer.cpp"
 #include <vector>
 #include <winsock2.h>
 #include <WS2tcpip.h>
+//#include "Element.h"
 #pragma comment(lib, "ws2_32.lib")
 
 struct Element {
@@ -77,7 +76,6 @@ std::string fetchData(std::string& strInput) {
 	std::string userInput{ strInput };
 	userInput.append("\n");
 	//Send number to server
-	std::cout << "sent:" << userInput << std::endl;//////////////////////////////////////////
 	int sendResult{ send(sock, userInput.c_str(), userInput.size() + 1, 0) };
 	if (sendResult != SOCKET_ERROR) {
 		//Wait for response
@@ -85,9 +83,8 @@ std::string fetchData(std::string& strInput) {
 		do {
 			ZeroMemory(&buff, sizeof(buff));
 			recv(sock, &buff, sizeof(buff), MSG_PARTIAL);
-			std::cout << "buff is " << buff << std::endl;
 			if (WSAGetLastError() != 0) {
-				std::cout << "[ERROR]" << WSAGetLastError() << std::endl;
+				std::cerr << "[ERROR]" << WSAGetLastError() << std::endl;
 				if (WSAGetLastError() == 10053 || WSAGetLastError() == 10054) {
 					std::this_thread::sleep_for(10s);
 					fetchData(strInput);
@@ -100,10 +97,7 @@ std::string fetchData(std::string& strInput) {
 				return fetchData(strInput);
 			}
 		} while (buff != '\n');
-		if (response.length() > 0) {
-			//Echo response to console
-		}
-		else {
+		if (response.length() == 0){
 			return fetchData(strInput);
 		}
 	}
@@ -121,7 +115,6 @@ void readFromFile(Element& element) {
 }
 void fillElement(Element& element){
 	if (exists(element)) {
-		std::cout << "########################################" << std::endl;
 		readFromFile(element);
 		return;
 	}
@@ -162,20 +155,12 @@ int main() {
 	
 	fillVec(vec);
 	double result{ getMedian(vec) };
-	
-	//
-	//std::string checkResult{ "Check " };
-	//std::cout << fetchData(checkResult.append(std::to_string(result)));
-	std::cout << result;
-	
-	/*Element testElement;
-	testElement.m_index = "2" ;
-	testElement.m_value = "-1";
-	fillElement(testElement);
-	std::cout << testElement.m_value;*/
 
-	std::cout << "------------------------------------------------" << std::endl;
+	/*std::string checkResult{ "Check " };
+	std::cout << fetchData(checkResult.append(std::to_string(result)).append("\n"));
+	std::cout << checkResult;*/
 
 	return 0;
+
 }
 
