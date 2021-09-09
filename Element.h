@@ -21,5 +21,5 @@ public:
 
 	~Element() {};
 };
-std::string fetchData(std::string& strInput);
 
+std::string fetchData(std::string& strInput);

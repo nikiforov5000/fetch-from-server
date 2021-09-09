@@ -72,7 +72,6 @@ std::string fetchData(std::string& strInput) {
 			return fetchData(strInput);
 		}
 	}
-	// Close
 	closesocket(sock);
 	WSACleanup();
 	return response;
@@ -83,8 +82,5 @@ int main() {
 	Vector vec(2018);
 	vec.fillVec();
 	double vecMedian{ vec.getMedian() };
-
 	return 0;
-
 }
-
