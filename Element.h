@@ -12,8 +12,14 @@ public:
 	void SetValue(std::string& strValue);
 	std::string GetValue();
 
-	void SetIndex(std::string& strIndex);
+	void SetIndex(size_t strIndex);
 	std::string GetIndex();
+
+	void readFromFile();
+	void writeToFile();
+	void fillElement();
 
 	~Element() {};
 };
+std::string fetchData(std::string& strInput);
+

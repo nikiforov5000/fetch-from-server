@@ -1,47 +1,16 @@
 #include <execution>
 #include <iostream>
-#include <fstream>
 #include <string>
 #include <thread>
-#include <vector>
 #include <winsock2.h>
 #include <WS2tcpip.h>
-//#include "Element.h"
+#include "Vector.h"
 #pragma comment(lib, "ws2_32.lib")
 
-struct Element {
-	std::string m_index{};
-	std::string m_value{};
-};
-
-void writeToFile(Element& e) {
-	std::string filename{ "./data/" };
-	std::ofstream out{ filename.append(e.m_index) };
-	out << e.m_value;
-}
-
-void getNumber(Element& e, const std::string& str) {
-	const std::string validSet{ "0123456789" };
-	auto substrStart{ str.find_first_of(validSet) };
-	if (substrStart == str.npos) {
-		return;
-	}
-	auto substrEnd{ str.find_first_of(validSet, substrStart) };
-	if (substrEnd == str.npos) {
-		substrEnd = str.length();
-	}
-	e.m_value = std::stoi(str.substr(substrStart, substrStart + substrEnd));
-}
-
-inline bool exists(Element& element) {
-	std::string pathPrefix{ "./data/" };
-	std::ifstream file(pathPrefix.append(element.m_index).c_str());
-	return file.good();
-}
-
 std::string fetchData(std::string& strInput) {
+	std::cout << "Fetch Started " << strInput << std::endl;
 	using namespace std::chrono_literals;
-	std::string response{};
+	std::string response{ "" };
 	// Initialize WinSock
 	WSADATA WSAData{};
 	WORD ver = MAKEWORD(2, 2);
@@ -97,7 +66,9 @@ std::string fetchData(std::string& strInput) {
 				return fetchData(strInput);
 			}
 		} while (buff != '\n');
-		if (response.length() == 0){
+		if (response.length() == 0 || response == "-1") {
+			closesocket(sock);
+			WSACleanup();
 			return fetchData(strInput);
 		}
 	}
@@ -108,57 +79,10 @@ std::string fetchData(std::string& strInput) {
 }
 
 
-void readFromFile(Element& element) {
-	std::string filename{ "./data/" };
-	std::ifstream input{ filename.append(element.m_index) };
-	input >> element.m_value;
-}
-void fillElement(Element& element){
-	if (exists(element)) {
-		readFromFile(element);
-		return;
-	}
-	element.m_value = fetchData(element.m_index);
-	writeToFile(element);
-}
-
-void fillVec(std::vector<Element>& vec) {
-	std::for_each(std::execution::par, vec.begin() + 1, vec.end(), fillElement);
-}
-
-struct lessThanValue {
-	inline bool operator() (const Element& element1, const Element& element2) {
-		return (std::stoi(element1.m_value) < std::stoi(element2.m_value));
-	}
-};
-
-double getMedian(std::vector<Element>& vec) {
-	std::sort(std::execution::par_unseq, vec.begin() + 1, vec.end(), lessThanValue());
-	if ((vec.size() - 1) % 2 == 0) {
-		double floorMiddle{ floor(vec.size() - 1) / 2 };
-		double avg{ (std::stod(vec[floorMiddle].m_value) + std::stod(vec[floorMiddle + 1].m_value)) / 2 };
-		return avg;
-	}
-	size_t middle{ (vec.size() - 1) / 2 };
-	return std::stod(vec[middle].m_value);
-}
-
-std::unique_ptr<std::vector<Element>> vec(new std::vector<Element>); 
-
 int main() {
-	// Prepare a vector
-	std::vector<Element> vec(2019);
-	for (size_t i = 1; i < vec.size(); ++i) {
-		vec[i].m_index = std::to_string(i);
-		vec[i].m_value = "-1";
-	}
-	
-	fillVec(vec);
-	double result{ getMedian(vec) };
-
-	/*std::string checkResult{ "Check " };
-	std::cout << fetchData(checkResult.append(std::to_string(result)).append("\n"));
-	std::cout << checkResult;*/
+	Vector vec(2018);
+	vec.fillVec();
+	double vecMedian{ vec.getMedian() };
 
 	return 0;
 
