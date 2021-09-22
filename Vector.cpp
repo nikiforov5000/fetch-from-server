@@ -1,5 +1,8 @@
+#include <array>
 #include <execution>
 #include "Vector.h"
+#pragma once 
+#include <iostream>
 
 bool Vector::isFull(size_t start, size_t end) {
 	for (size_t i = start; i < end && i < m_size; ++i) {
@@ -28,10 +31,10 @@ void Vector::fillVec() {
 	double sleepTime{ 35 };
 	do {
 		for (size_t i = (size_t)start; i < (size_t)end && i < m_size; ++i) {
-			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+			std::this_thread::sleep_for(std::chrono::milliseconds(10));
 			results[i] = std::async(std::launch::async, [this, i]() { m_vec[i].fillElement(); });
 		}
-		if (emptyElements(start, end) > 3) {
+		if (emptyElements(start, end) > 5) {
 			std::this_thread::sleep_for(std::chrono::seconds((int)sleepTime));
 		}
 		size_t numOfEmpty{ emptyElements(1, m_size) };

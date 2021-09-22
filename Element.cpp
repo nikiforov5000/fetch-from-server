@@ -46,7 +46,6 @@ void Element::writeToFile() {
 	out << m_value;
 }
 
-
 int Element::fetchData() {
 	using namespace std::chrono_literals;
 	int response{ 0 };
@@ -120,12 +119,20 @@ int Element::fetchData() {
 }
 
 void Element::fillElement() {
+	auto timepoint{ std::chrono::system_clock::now() + std::chrono::seconds(35) };
 	if (exists(m_index)) {
 		m_value = readFromFile(m_index);
 		return;
 	}
 	do {
-		m_value = fetchData();
+		auto result{ std::async(std::launch::deferred, [this]() {
+			return fetchData();
+			}) 
+		};
+		if (result.valid()) {
+			auto status = result.wait_until(timepoint);
+			m_value = result.get();
+		}
 	} while (m_value == -1);
 	writeToFile();
 }
