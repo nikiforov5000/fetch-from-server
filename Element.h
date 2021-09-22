@@ -17,9 +17,9 @@ public:
 	std::string GetIndex();
 
 	void writeToFile();
+	int fetchData();
 	void fillElement();
 
 	~Element() {};
 };
 
-int fetchData(std::string& strInput);
