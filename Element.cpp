@@ -1,9 +1,10 @@
 #include <fstream>
-#include <future>
 #include "Element.h"
 #include <winsock2.h>
 #include <WS2tcpip.h>
 #pragma comment(lib, "ws2_32.lib")
+#pragma once
+#include <iostream>
 
 
 Element::Element(std::string index) :m_index(index) {
@@ -104,7 +105,7 @@ int Element::fetchData() {
 				return -1;
 			}
 			if (buff >= 48 && buff <= 57) {
-				response = (response * 10) + (buff + 0);
+				response = (response * 10) + (int)buff - 48;
 			}
 		} while (buff != '\n');
 		if (response == -1) {

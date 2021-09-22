@@ -1,6 +1,7 @@
+#include <vector>
 #pragma once
 #include "Element.h"
-#include <vector>
+
 class Vector {
 private:
 	size_t m_size{};
@@ -14,11 +15,10 @@ public:
 		}
 	};
 	bool isFull(size_t start, size_t end);
-	size_t emptyElements(float start, float end);
+	size_t emptyElements(double start, double end);
 	void fillVec();
 	double getMedian();
 	size_t GetSize();
-
 	~Vector() {};
 };
 
