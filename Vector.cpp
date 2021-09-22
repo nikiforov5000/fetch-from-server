@@ -7,7 +7,7 @@
 
 bool Vector::isFull(size_t start, size_t end) {
 	for (size_t i = start; i < end && i < m_size; ++i) {
-		if (m_vec[i].GetValue() == "") {
+		if (m_vec[i].GetValue() == -1) {
 			return false;
 		}
 	}
@@ -17,7 +17,7 @@ bool Vector::isFull(size_t start, size_t end) {
 size_t Vector::emptyElements(size_t start, size_t end) {
 	size_t count{ 0 };
 	for (size_t i = start; i < end && i < m_size; ++i) {
-		if (m_vec[i].GetValue() == "") {
+		if (m_vec[i].GetValue() == -1) {
 			count++;
 		}
 	}
@@ -80,7 +80,7 @@ void Vector::fillVec() {
 
 struct lessThanValue {
 	inline bool operator() (Element& element1, Element& element2) {
-		return (std::stoi(element1.GetValue()) < std::stoi(element2.GetValue()));
+		return (element1.GetValue() < element2.GetValue());
 	}
 };
 
@@ -88,11 +88,11 @@ double Vector::getMedian() {
 	std::sort(std::execution::par_unseq, m_vec.begin() + 1, m_vec.end(), lessThanValue());
 	if ((m_vec.size() - 1) % 2 == 0) {
 		double floorMiddle{ floor(m_vec.size() - 1) / 2 };
-		double avg{ (std::stod(m_vec[floorMiddle].GetValue()) + std::stod(m_vec[floorMiddle + 1].GetValue())) / 2 };
+		double avg{ (m_vec[floorMiddle].GetValue() + m_vec[floorMiddle + 1].GetValue()) / 2.0 };
 		return avg;
 	}
 	size_t middle{ (m_vec.size() - 1) / 2 };
-	return std::stod(m_vec[middle].GetValue());
+	return m_vec[middle].GetValue();
 }
 
 size_t Vector::GetSize() {

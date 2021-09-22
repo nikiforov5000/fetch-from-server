@@ -5,13 +5,13 @@
 class Element {
 private:
 	std::string m_index;
-	std::string m_value;
+	int m_value{ -1 };
 public:
 	Element() {};
-	Element(std::string index, std::string value);
+	Element(std::string index);
 
-	void SetValue(std::string& strValue);
-	std::string GetValue();
+	void SetValue(int strValue);
+	const int GetValue();
 
 	void SetIndex(size_t strIndex);
 	std::string GetIndex();
@@ -22,4 +22,4 @@ public:
 	~Element() {};
 };
 
-std::string fetchData(std::string& strInput);
+int fetchData(std::string& strInput);

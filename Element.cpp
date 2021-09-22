@@ -3,13 +3,13 @@
 #include <fstream>
 #include <future>
 
-Element::Element(std::string index, std::string value) :m_index(index), m_value(value) {
+Element::Element(std::string index) :m_index(index) {
 
 };
-void Element::SetValue(std::string& strValue) {
+void Element::SetValue(int strValue) {
 	m_value = strValue;
 }
-std::string Element::GetValue() {
+const int Element::GetValue() {
 	return m_value;
 }
 void Element::SetIndex(size_t strIndex) {
@@ -19,22 +19,22 @@ std::string Element::GetIndex() {
 	return m_index;
 }
 
-std::string readFromFile(std::string& index) {
+int readFromFile(std::string& index) {
 	std::string filename{ "./data/" };
 	std::ifstream input{ filename.append(index) };
 	std::string buffer;
 	input >> buffer;
-	return buffer;
+	return std::stoi(buffer);
 }
 
 inline bool exists(std::string& fileName) {
 	std::string pathPrefix{ "./data/" };
 	std::ifstream file(pathPrefix.append(fileName).c_str());
-	return file.good() && readFromFile(fileName) != "";
+	return file.good() && readFromFile(fileName) != 0;
 }
 
 void Element::writeToFile() {
-	if (m_value == "") {
+	if (m_value == 0) {
 		return;
 	}
 	std::string filename{ "./data/" };
@@ -44,12 +44,11 @@ void Element::writeToFile() {
 void Element::fillElement() {					//wait_for version
 	if (exists(m_index)) {
 		m_value = readFromFile(m_index);
-		std::cout << "Read from file: " << m_value << std::endl;
 		return;
 	}
 	do {
 		m_value = fetchData(m_index);
-	} while (m_value == "");
+	} while (m_value == 0);
 	writeToFile();
 }
 

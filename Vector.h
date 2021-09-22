@@ -8,10 +8,9 @@ private:
 public:
 	Vector(size_t size) :m_size(size){
 		++m_size;
-		std::string minusOne{ "" };
 		for (size_t i = 1; i < m_size; ++i) {
 			m_vec[i].SetIndex(i);
-			m_vec[i].SetValue(minusOne);
+			//m_vec[i].SetValue(-1);
 		}
 	};
 	bool isFull(size_t start, size_t end);

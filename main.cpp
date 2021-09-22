@@ -7,16 +7,16 @@
 #include "Vector.h"
 #pragma comment(lib, "ws2_32.lib")
 
-std::string fetchData(std::string& strInput) {
+int fetchData(std::string& strInput) {
 	using namespace std::chrono_literals;
-	std::string response{ "" };
+	int response{ 0 };
 	// Initialize WinSock
 	WSADATA WSAData{};
 	WORD ver = MAKEWORD(2, 2);
 	int wsResult = WSAStartup(ver, &WSAData);
 	if (wsResult != 0) {
 		std::cerr << "[ERROR] Can't start winsock, Err# " << wsResult << std::endl;
-		return "";
+		return -1;
 	}
 	// Create socket
 	SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -24,7 +24,7 @@ std::string fetchData(std::string& strInput) {
 		std::cerr << "[ERROR] Can't create socket, Err# " << WSAGetLastError() << std::endl;
 		closesocket(sock);
 		WSACleanup();
-		return "";
+		return -1;
 	}
 	// Fill in a hint structure
 	std::string ipAddress{ "88.212.241.115" };
@@ -39,13 +39,13 @@ std::string fetchData(std::string& strInput) {
 		std::cerr << "[ERROR] Can't connect to server. Err# " << WSAGetLastError() << std::endl;
 		closesocket(sock);
 		WSACleanup();
-		return "";
+		return -1;
 	}
 	char buff;
 	std::string userInput{ strInput };
 	userInput.append("\n");
 	//Send number to server
-	int sendResult{ send(sock, userInput.c_str(), userInput.size() + 1, 0) };
+	int sendResult{ send(sock, userInput.c_str(), (int)userInput.size() + 1, 0) };
 	// Do-while loop to send and receive data
 	if (sendResult != SOCKET_ERROR) {
 		//Wait for response
@@ -57,21 +57,21 @@ std::string fetchData(std::string& strInput) {
 				std::cerr << "[ERROR]" << WSAGetLastError() << std::endl;
 				closesocket(sock);
 				WSACleanup();
-				return "";
+				return -1;
 			}
-			if (buff >= 48 && buff <= 57) {
-				response.append(std::string(1, buff));
-			}
-			if (count++ > 100) {
+			if (count++ > 96) {
 				closesocket(sock);
 				WSACleanup();
-				return "";
+				return -1;
+			}
+			if (buff >= 48 && buff <= 57) {
+				response = (response * 10) + (buff + 0);
 			}
 		} while (buff != '\n');
-		if (response.length() == 0 || response == "") {
+		if (response == -1) {
 			closesocket(sock);
 			WSACleanup();
-			return "";
+			return -1;
 		}
 	}
 	closesocket(sock);
