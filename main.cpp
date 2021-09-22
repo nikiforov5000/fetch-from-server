@@ -8,7 +8,6 @@
 #pragma comment(lib, "ws2_32.lib")
 
 std::string fetchData(std::string& strInput) {
-	//std::cout << "Fetch Started " << strInput << std::endl;
 	using namespace std::chrono_literals;
 	std::string response{ "" };
 	// Initialize WinSock
@@ -18,14 +17,14 @@ std::string fetchData(std::string& strInput) {
 	if (wsResult != 0) {
 		std::cerr << "[ERROR] Can't start winsock, Err# " << wsResult << std::endl;
 		return "";
-		//return fetchData(strInput);//////////////////////////////
 	}
 	// Create socket
 	SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
 	if (sock == INVALID_SOCKET) {
 		std::cerr << "[ERROR] Can't create socket, Err# " << WSAGetLastError() << std::endl;
+		closesocket(sock);
+		WSACleanup();
 		return "";
-		//return fetchData(strInput);//////////////////////////////
 	}
 	// Fill in a hint structure
 	std::string ipAddress{ "88.212.241.115" };
@@ -41,14 +40,13 @@ std::string fetchData(std::string& strInput) {
 		closesocket(sock);
 		WSACleanup();
 		return "";
-		//return fetchData(strInput);//////////////////////////////
 	}
-	// Do-while loop to send and receive data
 	char buff;
 	std::string userInput{ strInput };
 	userInput.append("\n");
 	//Send number to server
 	int sendResult{ send(sock, userInput.c_str(), userInput.size() + 1, 0) };
+	// Do-while loop to send and receive data
 	if (sendResult != SOCKET_ERROR) {
 		//Wait for response
 		size_t count{ 0 };
@@ -57,13 +55,9 @@ std::string fetchData(std::string& strInput) {
 			recv(sock, &buff, sizeof(buff), MSG_PARTIAL);
 			if (WSAGetLastError() != 0) {
 				std::cerr << "[ERROR]" << WSAGetLastError() << std::endl;
-				if (WSAGetLastError() == 10053 || WSAGetLastError() == 10054) {
-					std::this_thread::sleep_for(1s);
-					closesocket(sock);
-					WSACleanup();
-					return "";
-					//return fetchData(strInput);//////////////////////////////
-				}
+				closesocket(sock);
+				WSACleanup();
+				return "";
 			}
 			if (buff >= 48 && buff <= 57) {
 				response.append(std::string(1, buff));
@@ -72,14 +66,12 @@ std::string fetchData(std::string& strInput) {
 				closesocket(sock);
 				WSACleanup();
 				return "";
-				//return fetchData(strInput);//////////////////////////////
 			}
 		} while (buff != '\n');
 		if (response.length() == 0 || response == "") {
 			closesocket(sock);
 			WSACleanup();
 			return "";
-			//return fetchData(strInput);//////////////////////////////
 		}
 	}
 	closesocket(sock);
@@ -93,12 +85,12 @@ int main() {
 	vec.fillVec();
 	double vecMedian{ vec.getMedian() };
 
+	// Print 
 	auto endTime{ std::chrono::system_clock::now() };
 	auto duration{ std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() };
 	std::cout << "Median is: " << std::to_string(vecMedian) << std::endl;
 	std::cout << "Total sec: " << duration / 1000 << std::endl;
 	std::cout << ((duration * 2018) / 1000) / vec.GetSize() << " sec per 2018" << std::endl;
-	//std::cout << endTime. - startTime << 
 	
 	return 0;
 }
