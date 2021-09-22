@@ -7,16 +7,18 @@ private:
 	std::vector<Element> m_vec{m_size + 1};
 public:
 	Vector(size_t size) :m_size(size){
-		std::string minusOne{ "-1" };
-		for (size_t i = 1; i < m_vec.size(); ++i) {
-
+		++m_size;
+		std::string minusOne{ "" };
+		for (size_t i = 1; i < m_size; ++i) {
 			m_vec[i].SetIndex(i);
 			m_vec[i].SetValue(minusOne);
 		}
 	};
-	bool isFull();
+	bool isFull(size_t start, size_t end);
+	size_t emptyElements(size_t start, size_t end);
 	void fillVec();
 	double getMedian();
+	size_t GetSize();
 
 	~Vector() {};
 };

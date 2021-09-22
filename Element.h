@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 #include <string>
 
 class Element {
@@ -15,7 +16,6 @@ public:
 	void SetIndex(size_t strIndex);
 	std::string GetIndex();
 
-	void readFromFile();
 	void writeToFile();
 	void fillElement();
 

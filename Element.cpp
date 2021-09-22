@@ -1,5 +1,7 @@
 #include "Element.h"
+
 #include <fstream>
+#include <future>
 
 Element::Element(std::string index, std::string value) :m_index(index), m_value(value) {
 
@@ -17,34 +19,45 @@ std::string Element::GetIndex() {
 	return m_index;
 }
 
+std::string readFromFile(std::string& index) {
+	std::string filename{ "./data/" };
+	std::ifstream input{ filename.append(index) };
+	std::string buffer;
+	input >> buffer;
+	return buffer;
+}
+
 inline bool exists(std::string& fileName) {
 	std::string pathPrefix{ "./data/" };
 	std::ifstream file(pathPrefix.append(fileName).c_str());
-	return file.good();
-}
-
-void Element::readFromFile() {
-	std::string filename{ "./data/" };
-	std::ifstream input{ filename.append(m_index) };
-	std::string buffer;
-	input >> buffer;
-	m_value = buffer;
+	return file.good() && readFromFile(fileName) != "";
 }
 
 void Element::writeToFile() {
-	std::string filename{ "./data/" };
-	std::ofstream out{ filename.append(m_index) };
-	if (m_value == "-1") {
-		;
-	}
-	out << m_value;
-}
-
-void Element::fillElement() {
-	if (exists(m_index)) {
-		readFromFile();
+	if (m_value == "") {
 		return;
 	}
-	m_value = fetchData(m_index);
+	std::string filename{ "./data/" };
+	std::ofstream out{ filename.append(m_index) };
+	out << m_value;
+}
+void Element::fillElement() {					//wait_for version
+	if (exists(m_index)) {
+		m_value = readFromFile(m_index);
+		std::cout << "Read from file: " << m_value << std::endl;
+		return;
+	}
+	do {
+		m_value = fetchData(m_index);
+	} while (m_value == "");
 	writeToFile();
 }
+
+//void Element::fillElement() {					//for_each version
+//	if (exists(m_index)) {
+//		m_value = readFromFile(m_index);
+//		return;
+//	}
+//	m_value = fetchData(m_index);
+//	writeToFile();
+//}
