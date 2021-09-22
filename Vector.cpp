@@ -1,9 +1,6 @@
 #include <execution>
 #include <future>
 #include "Vector.h"
-#pragma once
-#include <execution>
-#include <iostream>
 
 bool Vector::isFull(size_t start, size_t end) {
 	for (size_t i = start; i < end && i < m_size; ++i) {
@@ -14,22 +11,14 @@ bool Vector::isFull(size_t start, size_t end) {
 	return true;
 }
 
-size_t Vector::emptyElements(size_t start, size_t end) {
-	size_t count{ 0 };
-	for (size_t i = start; i < end && i < m_size; ++i) {
+size_t Vector::emptyElements(float start, float end) {
+	float count{ 0 };
+	for (float i = start; i < end && i < m_size; ++i) {
 		if (m_vec[i].GetValue() == -1) {
 			count++;
 		}
 	}
 	return count;
-}
-
-void printStopwatch(size_t seconds) {
-	while (seconds) {
-		std::cout << seconds-- << " ";
-		std::this_thread::sleep_for(std::chrono::seconds(1));
-	}
-	std::cout << std::endl;
 }
 
 void Vector::fillVec() {
@@ -39,28 +28,21 @@ void Vector::fillVec() {
 	float end{ start + step };
 	float sleepTime{ 35 };
 	do {
-		for (size_t i = start; i < end && i < m_size; ++i) {
+		for (size_t i = (size_t)start; i < (size_t)end && i < m_size; ++i) {
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
 			results[i] = std::async(std::launch::async, [this, i]() { m_vec[i].fillElement(); });
 		}
-			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 		if (emptyElements(start, end) > 3) {
-			auto temp = std::async(std::launch::async, printStopwatch, sleepTime);
 			std::this_thread::sleep_for(std::chrono::seconds((int)sleepTime));
-		std::cout << "______________EMPTY is " << emptyElements(start, end) << " out of " << (step) << std::endl;
 		}
 		size_t numOfEmpty{ emptyElements(1, m_size) };
 		if (emptyElements(start, end) > step / 2.0f) {
 			step = (step / 1.2f) + 1.0f;
 			sleepTime *= 1.2f;
-			//std::cout << "=====STEP IS " << step << std::endl;
-			//std::cout << "+++++++++++++++++++SLEEP IS "<< sleepTime << std::endl;
-			std::this_thread::sleep_for(std::chrono::seconds(1));
 		}
 		else if (emptyElements(start, end) < step / 5.0f) {
-			step *= 1.2; 
+			step *= 1.2f; 
 			sleepTime / 1.2f;
-			//std::cout << "=====STEP IS " << step << std::endl;
-			//std::cout << "+++++++++++++++++++SLEEP IS " << sleepTime << std::endl;
 		}
 		if (numOfEmpty < step) {
 			start = 1;
@@ -88,7 +70,7 @@ double Vector::getMedian() {
 	std::sort(std::execution::par_unseq, m_vec.begin() + 1, m_vec.end(), lessThanValue());
 	if ((m_vec.size() - 1) % 2 == 0) {
 		double floorMiddle{ floor(m_vec.size() - 1) / 2 };
-		double avg{ (m_vec[floorMiddle].GetValue() + m_vec[floorMiddle + 1].GetValue()) / 2.0 };
+		double avg{ ((double)m_vec[floorMiddle].GetValue() + (double)m_vec[floorMiddle + 1].GetValue()) / 2.0 };
 		return avg;
 	}
 	size_t middle{ (m_vec.size() - 1) / 2 };

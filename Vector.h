@@ -14,7 +14,7 @@ public:
 		}
 	};
 	bool isFull(size_t start, size_t end);
-	size_t emptyElements(size_t start, size_t end);
+	size_t emptyElements(float start, float end);
 	void fillVec();
 	double getMedian();
 	size_t GetSize();
