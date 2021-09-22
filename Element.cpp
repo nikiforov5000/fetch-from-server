@@ -48,7 +48,7 @@ void Element::fillElement() {					//wait_for version
 	}
 	do {
 		m_value = fetchData(m_index);
-	} while (m_value == 0);
+	} while (m_value == -1);
 	writeToFile();
 }
 
